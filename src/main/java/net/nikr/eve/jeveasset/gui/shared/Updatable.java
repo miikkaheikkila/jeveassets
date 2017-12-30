@@ -22,7 +22,8 @@
 package net.nikr.eve.jeveasset.gui.shared;
 
 import java.util.Date;
-import net.nikr.eve.jeveasset.Program;
+
+import net.nikr.eve.jeveasset.AbstractProgram;
 import net.nikr.eve.jeveasset.data.api.accounts.EveApiAccount;
 import net.nikr.eve.jeveasset.data.api.accounts.OwnerType;
 import net.nikr.eve.jeveasset.data.settings.Settings;
@@ -30,10 +31,10 @@ import net.nikr.eve.jeveasset.data.settings.Settings;
 
 public class Updatable {
 
-	private final Program program;
+	private final AbstractProgram program;
 
-	public Updatable(final Program program) {
-		this.program = program;
+	public Updatable(final AbstractProgram abstractProgram) {
+		this.program = abstractProgram;
 	}
 
 	public boolean isUpdatable() {

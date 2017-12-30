@@ -21,7 +21,6 @@
 
 package net.nikr.eve.jeveasset;
 
-import apple.dts.samplecode.osxadapter.OSXAdapter;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,12 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+import apple.dts.samplecode.osxadapter.OSXAdapter;
 import net.nikr.eve.jeveasset.data.api.accounts.OwnerType;
 import net.nikr.eve.jeveasset.data.api.my.MyAccountBalance;
 import net.nikr.eve.jeveasset.data.api.my.MyAsset;
@@ -91,31 +93,11 @@ import net.nikr.eve.jeveasset.i18n.GuiFrame;
 import net.nikr.eve.jeveasset.i18n.GuiShared;
 import net.nikr.eve.jeveasset.i18n.TabsTracker;
 import net.nikr.eve.jeveasset.io.online.PriceDataGetter;
-import net.nikr.eve.jeveasset.io.online.Updater;
 import net.nikr.eve.jeveasset.io.shared.DesktopUtil;
 import net.nikr.eve.jeveasset.io.shared.FileUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-
-public class Program implements ActionListener {
-	private static final Logger LOG = LoggerFactory.getLogger(Program.class);
-
-	private enum ProgramAction {
-		TIMER
-	}
-	//Major.Minor.Bugfix [Release Candidate n] [BETA n] [DEV BUILD #n];
-	public static final String PROGRAM_VERSION = "5.3.1 DEV BUILD 1";
-	public static final String PROGRAM_NAME = "jEveAssets";
-	public static final String PROGRAM_HOMEPAGE = "https://eve.nikr.net/jeveasset";
-	public static final boolean PROGRAM_DEV_BUILD = false;
-
-	private static boolean debug = false;
-	private static boolean forceUpdate = false;
-	private static boolean forceNoUpdate = false;
-	private static boolean portable = false;
-	private static boolean lazySave = false;
-
+public class Program extends AbstractProgram implements ActionListener {
+	
 	//GUI
 	private MainWindow mainWindow;
 
@@ -147,23 +129,13 @@ public class Program implements ActionListener {
 	private StructureUpdateDialog structureUpdateDialog;
 	private EveKitTrackerImportDialog eveKitTrackerImportDialog;
 
-	//Misc
-	private Updater updater;
-	private Timer timer;
-	private Updatable updatable;
-
 	private final List<JMainTab> jMainTabs = new ArrayList<JMainTab>();
-
-	//Data
-	private final ProfileData profileData;
-	private final ProfileManager profileManager;
-	private final PriceDataGetter priceDataGetter;
-	private final String localData;
 
 	//Height
 	private static int height = 0;
-
+	
 	public Program() {
+		super();
 		height = calcButtonsHeight();
 		if (debug) {
 			LOG.debug("Force Update: {} Force No Update: {}", forceUpdate, forceNoUpdate);
@@ -179,21 +151,13 @@ public class Program implements ActionListener {
 		StaticData.load();
 		Settings.load();
 
-		updater = new Updater();
-		localData = updater.getLocalData();
 		if (!PROGRAM_DEV_BUILD) {
 			update();
 		}
 
-		profileManager = new ProfileManager();
-		profileManager.searchProfile();
-		profileManager.loadActiveProfile();
-		profileData = new ProfileData(profileManager);
-		//Can not update profile data now - list needs to be empty doing creation...
-		priceDataGetter = new PriceDataGetter();
-		priceDataGetter.load();
+		
 	//Timer
-		timer = new Timer(15000, this); //Once a minute
+		timer = new Timer(15000, this); // once a minute!
 		timer.setActionCommand(ProgramAction.TIMER.name());
 	//Updatable
 		updatable = new Updatable(this);
@@ -320,10 +284,7 @@ public class Program implements ActionListener {
 	 * @param load does nothing except change the signature.
 	 */
 	protected Program(final boolean load) {
-		profileData = null;
-		profileManager = null;
-		priceDataGetter = null;
-		localData = null;
+		super(load);
 	}
 
 	public static int getButtonsHeight() {
@@ -760,37 +721,7 @@ public class Program implements ActionListener {
 		});
 	}
 
-	public static boolean isDebug() {
-		return debug;
-	}
-
-	public static void setDebug(final boolean debug) {
-		Program.debug = debug;
-	}
-
-	public static boolean isForceNoUpdate() {
-		return forceNoUpdate;
-	}
-
-	public static void setForceNoUpdate(final boolean forceNoUpdate) {
-		Program.forceNoUpdate = forceNoUpdate;
-	}
-
-	public static boolean isForceUpdate() {
-		return forceUpdate;
-	}
-
-	public static void setForceUpdate(final boolean forceUpdate) {
-		Program.forceUpdate = forceUpdate;
-	}
-
-	public static void setPortable(final boolean portable) {
-		Program.portable = portable;
-	}
-
-	public static void setLazySave(final boolean lazySave) {
-		Program.lazySave = lazySave;
-	}
+	
 
 	public static boolean isPortable() {
 		return portable;

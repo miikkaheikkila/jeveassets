@@ -20,18 +20,22 @@
  */
 package net.nikr.eve.jeveasset.data.profile;
 
-import net.nikr.eve.jeveasset.data.api.accounts.EveApiAccount;
 import java.util.ArrayList;
 import java.util.List;
-import net.nikr.eve.jeveasset.SplashUpdater;
-import net.nikr.eve.jeveasset.data.api.accounts.EveKitOwner;
-import net.nikr.eve.jeveasset.data.api.accounts.OwnerType;
-import net.nikr.eve.jeveasset.data.api.accounts.EsiOwner;
-import net.nikr.eve.jeveasset.io.local.ProfileReader;
-import net.nikr.eve.jeveasset.io.local.ProfileWriter;
-import net.nikr.eve.jeveasset.io.local.ProfileFinder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.nikr.eve.jeveasset.Main;
+import net.nikr.eve.jeveasset.SplashUpdater;
+import net.nikr.eve.jeveasset.data.api.accounts.EsiOwner;
+import net.nikr.eve.jeveasset.data.api.accounts.EveApiAccount;
+import net.nikr.eve.jeveasset.data.api.accounts.EveKitOwner;
+import net.nikr.eve.jeveasset.data.api.accounts.OwnerType;
+import net.nikr.eve.jeveasset.io.local.ProfileFinder;
+import net.nikr.eve.jeveasset.io.local.ProfileReader;
+import net.nikr.eve.jeveasset.io.local.ProfileWriter;
+import net.nikr.eve.jeveasset.io.shared.AllTasksUpdater;
 
 
 public class ProfileManager {
@@ -103,8 +107,12 @@ public class ProfileManager {
 		eveKitOwners.clear();
 		esiOwners.clear();
 		ProfileReader.load(this, activeProfile.getFilename()); //Assets (Must be loaded before the price data)
-		SplashUpdater.setProgress(40);
-	//Price data (update as needed)
-		SplashUpdater.setProgress(45);
+		if (!Main.isBackgroundMode()) {
+			SplashUpdater.setProgress(40);
+			SplashUpdater.setProgress(45);
+		} else {
+			AllTasksUpdater allTasksUpdater = new AllTasksUpdater("allTasksUpdater", this);
+			allTasksUpdater.doInBackground();
+		}
 	}
 }

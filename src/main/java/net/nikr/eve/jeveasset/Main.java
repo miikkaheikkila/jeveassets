@@ -26,15 +26,18 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 import net.nikr.eve.jeveasset.io.local.FileLock;
 import net.nikr.eve.jeveasset.io.online.Updater;
 import net.nikr.eve.jeveasset.io.shared.FileUtil;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public final class Main {
 
@@ -43,6 +46,7 @@ public final class Main {
 	private static boolean forceNoUpdate = false;
 	private static boolean forceUpdate = false;
 	private static boolean lazySave = false;
+	private static boolean backgroundMode = false;
 
 	private static Logger log;
 
@@ -52,8 +56,10 @@ public final class Main {
 		//install the uncaught exception handlers
 		NikrUncaughtExceptionHandler.install();
 		//Splash screen
-		SplashUpdater splashUpdater = new SplashUpdater();
-		splashUpdater.start();
+		if (!backgroundMode) {
+			SplashUpdater splashUpdater = new SplashUpdater();
+			splashUpdater.start();
+		}
 		//Print program data
 		log.info("Starting " + Program.PROGRAM_NAME + " " + Program.PROGRAM_VERSION);
 		log.log(Level.INFO, "OS: {0} {1}", new Object[]{System.getProperty("os.name"), System.getProperty("os.version")});
@@ -70,7 +76,11 @@ public final class Main {
 			FileLock.unlockAll();
 		}
 		//Lets go!
-		Program program = new Program();
+		if (backgroundMode) {
+			BackgroundProgram program = new BackgroundProgram();
+		} else {
+			Program program = new Program();
+		}
 	}
 
 	/**
@@ -94,6 +104,9 @@ public final class Main {
 			}
 			if (arg.toLowerCase().equals("-lazysave")) {
 				lazySave = true;
+			}
+			if (arg.toLowerCase().equals("-backgroundmode")) {
+				backgroundMode = true;
 			}
 		}
 		//Force UTF-8 File system
@@ -152,14 +165,19 @@ public final class Main {
 		//XXX - Workaround: Allow basic proxy authorization
 		System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
 		System.setProperty("jdk.http.auth.proxying.disabledSchemes", "");
-
-		javax.swing.SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-			public void run() {
-				createAndShowGUI();
-			}
-		});
+		
+		if (backgroundMode) {
+			log.info("Started in background mode");
+			Main main = new Main();
+		} else {
+			javax.swing.SwingUtilities.invokeLater(
+				new Runnable() {
+					@Override
+				public void run() {
+					createAndShowGUI();
+				}
+			});
+		}
 	}
 
 	private static void createAndShowGUI() {
@@ -280,5 +298,9 @@ public final class Main {
 		files.add("oauth2-client-2.25.1.jar");
 		files.add("jaxb-api-2.3.0.jar");
 		return files;
+	}
+	
+	public static boolean isBackgroundMode() {
+		return backgroundMode;
 	}
 }
