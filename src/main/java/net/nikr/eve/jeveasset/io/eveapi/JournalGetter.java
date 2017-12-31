@@ -58,7 +58,7 @@ public class JournalGetter extends AbstractApiGetter<WalletJournalResponse> {
 		Map<Integer, List<JournalEntry>> updateList = updateList(accountKeys, NO_RETRIES, new ListHandler<Integer, List<JournalEntry>>() {
 			@Override
 			protected List<JournalEntry> get(String listUpdaterStatus, Integer t) throws ApiException {
-				return updateIDs(new HashSet<Long>(), NO_RETRIES, new IDsHandler<JournalEntry>() {
+				return updateIDs(new HashSet<Long>(), NO_RETRIES, (IDsHandler<JournalEntry>)new IDsHandler<JournalEntry>() {
 					@Override
 					protected List<JournalEntry> get(String idUpdaterStatus, Long fromID) throws ApiException {
 						if (fromID == null) {

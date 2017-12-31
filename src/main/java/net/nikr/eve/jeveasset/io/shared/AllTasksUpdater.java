@@ -9,6 +9,7 @@ import net.nikr.eve.jeveasset.data.api.accounts.EveApiOwner;
 import net.nikr.eve.jeveasset.data.api.accounts.EveKitOwner;
 import net.nikr.eve.jeveasset.data.profile.Profile;
 import net.nikr.eve.jeveasset.data.profile.ProfileManager;
+import net.nikr.eve.jeveasset.data.settings.Settings;
 import net.nikr.eve.jeveasset.gui.dialogs.update.UpdateTask;
 import net.nikr.eve.jeveasset.io.esi.EsiAccountBalanceGetter;
 import net.nikr.eve.jeveasset.io.esi.EsiAssetsGetter;
@@ -27,7 +28,9 @@ import net.nikr.eve.jeveasset.io.eveapi.BlueprintsGetter;
 import net.nikr.eve.jeveasset.io.eveapi.ContractItemsGetter;
 import net.nikr.eve.jeveasset.io.eveapi.ContractsGetter;
 import net.nikr.eve.jeveasset.io.eveapi.IndustryJobsGetter;
+import net.nikr.eve.jeveasset.io.eveapi.JournalGetter;
 import net.nikr.eve.jeveasset.io.eveapi.MarketOrdersGetter;
+import net.nikr.eve.jeveasset.io.eveapi.TransactionsGetter;
 import net.nikr.eve.jeveasset.io.evekit.EveKitAccountBalanceGetter;
 import net.nikr.eve.jeveasset.io.evekit.EveKitAssetGetter;
 import net.nikr.eve.jeveasset.io.evekit.EveKitBlueprintsGetter;
@@ -108,9 +111,9 @@ public class AllTasksUpdater extends UpdateTask {
 				updates.add(new ContractItemsGetter(this, owner));
 				updates.add(new ContractsGetter(this, owner));
 				updates.add(new IndustryJobsGetter(this, owner));
-				// updates.add(new JournalGetter(this, owner, true));
+				updates.add(new JournalGetter(this, owner, Settings.get().isJournalHistory()));
 				updates.add(new MarketOrdersGetter(this, owner, true));
-				// updates.add(new TransactionsGetter(this, owner, true));
+				updates.add(new TransactionsGetter(this, owner, Settings.get().isJournalHistory()));
 			}
 		}
 	}
